@@ -1,7 +1,9 @@
+import os, shutil
 from tkinter import *
 
 
 class Application(object):
+    PATH = 'users/'
 
     def __init__(self):
         self.root = Tk()
@@ -21,16 +23,30 @@ class Application(object):
         self.listbox.pack(fill='both', side='top')
 
     def but_start(self):
-        print("Hello World!")
+        pass
 
     def but_add_user(self):
-        self.listbox.insert(END, '- ' + self.input_user.get(0.0, END))
+        username = self.input_user.get(0.0, END)
+        if not username[:self.input_user.count(0.0, END)[0] - 1] in self.listbox.get(0, END) \
+                and not username in self.listbox.get(0, END):
+            self.listbox.insert(END, username)
+            os.mkdir(self.PATH + username[:self.input_user.count(0.0, END)[0] - 1])
 
     def but_delete_user(self):
         for i in reversed(self.listbox.curselection()):
             self.listbox.delete(i)
+        users = self.listbox.get(0, END)
+        for user in os.listdir(self.PATH):
+            if not user in users and not user + '\n' in users:
+                if os.path.exists(self.PATH + user):
+                    shutil.rmtree(self.PATH + user)
+
+    def load_users(self):
+        for user in os.listdir(self.PATH):
+            self.listbox.insert(END, user)
 
     def app_run(self):
+        self.load_users()
         self.root.mainloop()
 
 
