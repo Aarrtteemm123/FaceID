@@ -1,5 +1,6 @@
 import os, shutil
 from tkinter import *
+from FaceID import FaceID
 
 
 class Application(object):
@@ -17,20 +18,24 @@ class Application(object):
         self.but_add_user.pack(fill='both', side='top')
         self.but_delete_user = Button(self.root, bg='#c3b3e4', text="Delete user", command=self.but_delete_user)
         self.but_delete_user.pack(fill='both', side='top')
-        self.but_reset = Button(self.root, bg='#c3b3e4', text="Reset", command=self.but_start)
+        self.but_reset = Button(self.root, bg='#c3b3e4', text="Reset", command=self.but_reset)
         self.but_reset.pack(fill='both', side='top')
         self.listbox = Listbox(self.root, font='Arial 14', bg='#8bb4d3', height=5, selectmode=EXTENDED)
         self.listbox.pack(fill='both', side='top')
 
-    def but_start(self):
+    def but_reset(self):
         pass
+
 
     def but_add_user(self):
         username = self.input_user.get(0.0, END)
-        if not username[:self.input_user.count(0.0, END)[0] - 1] in self.listbox.get(0, END) \
+        short_name = username[:self.input_user.count(0.0, END)[0] - 1]
+        if not short_name in self.listbox.get(0, END) \
                 and not username in self.listbox.get(0, END):
             self.listbox.insert(END, username)
-            os.mkdir(self.PATH + username[:self.input_user.count(0.0, END)[0] - 1])
+            os.mkdir(self.PATH + short_name)
+            FaceID.create_person(self.PATH+short_name+'\\',10)
+
 
     def but_delete_user(self):
         for i in reversed(self.listbox.curselection()):
