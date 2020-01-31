@@ -5,6 +5,7 @@ from FaceID import FaceID
 
 class Application(object):
     PATH = 'users/'
+    IDENTIFY_ACCURACY = 0.5
 
     def __init__(self):
         self.root = Tk()
@@ -24,8 +25,9 @@ class Application(object):
         self.listbox.pack(fill='both', side='top')
 
     def but_reset(self):
-        pass
-
+        user_id = self.listbox.curselection()
+        # select with less index
+        FaceID.create_person(self.PATH + self.listbox.get(user_id[0]) + '\\', 10)
 
     def but_add_user(self):
         username = self.input_user.get(0.0, END)
@@ -34,8 +36,7 @@ class Application(object):
                 and not username in self.listbox.get(0, END):
             self.listbox.insert(END, username)
             os.mkdir(self.PATH + short_name)
-            FaceID.create_person(self.PATH+short_name+'\\',10)
-
+            FaceID.create_person(self.PATH + short_name + '\\', 10)
 
     def but_delete_user(self):
         for i in reversed(self.listbox.curselection()):
@@ -46,14 +47,21 @@ class Application(object):
                 if os.path.exists(self.PATH + user):
                     shutil.rmtree(self.PATH + user)
 
+    def identify_users(self):
+        for user_dir in os.listdir(self.PATH):
+            if len(os.listdir(self.PATH + '/' + user_dir)) == 0: continue
+            if FaceID.identify(self.PATH + '/' + user_dir, self.IDENTIFY_ACCURACY):
+                return True
+        return False
+
     def load_users(self):
-        for user in os.listdir(self.PATH):
-            self.listbox.insert(END, user)
+        if not os.path.exists('users'): os.mkdir('users')
+        for user in os.listdir(self.PATH): self.listbox.insert(END, user)
 
     def app_run(self):
         self.load_users()
+        self.identify_users()
         self.root.mainloop()
 
 
-app = Application()
-app.app_run()
+Application().app_run()  # run main function
