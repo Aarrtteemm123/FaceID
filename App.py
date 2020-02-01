@@ -1,5 +1,7 @@
 import os, shutil
 from tkinter import *
+from tkinter import messagebox
+
 from FaceID import FaceID
 
 
@@ -31,26 +33,28 @@ class Application(object):
 
     def but_add_user(self):
         username = self.input_user.get(0.0, END)
+        # without \n at the end
         short_name = username[:self.input_user.count(0.0, END)[0] - 1]
         if not short_name in self.listbox.get(0, END) \
                 and not username in self.listbox.get(0, END):
             self.listbox.insert(END, username)
-            os.mkdir(self.PATH + short_name)
+            os.mkdir(self.PATH + short_name) # create user folder
             FaceID.create_person(self.PATH + short_name + '\\', 10)
 
     def but_delete_user(self):
-        for i in reversed(self.listbox.curselection()):
+        for i in reversed(self.listbox.curselection()): # selected users
             self.listbox.delete(i)
         users = self.listbox.get(0, END)
         for user in os.listdir(self.PATH):
             if not user in users and not user + '\n' in users:
                 if os.path.exists(self.PATH + user):
-                    shutil.rmtree(self.PATH + user)
+                    shutil.rmtree(self.PATH + user) # remove user folder
 
     def identify_users(self):
         for user_dir in os.listdir(self.PATH):
             if len(os.listdir(self.PATH + '/' + user_dir)) == 0: continue
             if FaceID.identify(self.PATH + '/' + user_dir, self.IDENTIFY_ACCURACY):
+                messagebox.showinfo("Info", "Recognized successfully")
                 return True
         return False
 
